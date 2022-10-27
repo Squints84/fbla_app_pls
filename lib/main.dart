@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:ucvts_app_fbla/school_colors.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'custom_icons_icons.dart';
+import 'calendar_tab.dart';
 import 'extra.dart';
 import 'panel.dart';
 
 void main() => runApp(const MyApp());
 
 PanelController _pc = PanelController();
+CalendarTab calTab = CalendarTab();
 Slidey slide = Slidey();
 
 class MyApp extends StatelessWidget {
@@ -104,6 +106,7 @@ class _MyHomePageState extends State<MyHomePage> {
           child: TabBar(
             onTap: (int i){
               _pc.close();
+              i == 1 ? _pc.hide() : _pc.show();
             }, 
             tabs: const [
             Tab(icon: Icon(Icons.house)),
@@ -117,10 +120,11 @@ class _MyHomePageState extends State<MyHomePage> {
           TabBarView(physics: const NeverScrollableScrollPhysics(),children: [
             // The displays of the different tabs, in order (VERY IMPORTANT)
             ExtraStuff.centerAlign([ExtraStuff.weLoveAIT,]), 
-            _calendarTab(), //comment like this
+            calTab.tab(),
             ExtraStuff.centerAlign([
               const Icon(CustomIcons.ucvts),
-              Text("${DateTime.now().year.toString()}-${DateTime.now().month.toString()}-${DateTime.now().day.toString()}\n\nUCVTS Logo")
+              Text("${DateTime.now().year.toString()}-${DateTime.now().month.toString()}-${DateTime.now().day.toString()}"),
+              const Text("\n\nUCVTS Logo",style: TextStyle(color: SchoolColors.UCVTS))
             ]),
             ExtraStuff.centerAlign([
               Text('tabBar Height = 29\n\nOG Panel Height = ${screenHeight * 0.8}\n vs.\nError Height = ${(29 + 22 + (Slidey.buttonHeight * 4) + 40)}'),
@@ -146,11 +150,6 @@ class _MyHomePageState extends State<MyHomePage> {
       )
     );
   }
-
-  Widget _calendarTab(){
-    return ExtraStuff.centerAlign([const Text("I LOVE CALENDARS")]);
-  }
-
 }
 /*
 screenHeight * 0.7,

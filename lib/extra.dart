@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'school_colors.dart';
 
 class ExtraStuff {
   static Widget weLoveAIT = Column(
@@ -18,7 +19,7 @@ class ExtraStuff {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 38,
-            color: Colors.amber,
+            color: SchoolColors.AIT,
             decoration: TextDecoration.underline,
             decorationStyle: TextDecorationStyle.double),
           textAlign: TextAlign.center
