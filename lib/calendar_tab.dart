@@ -29,6 +29,8 @@ class _CalendarTabState extends State<CalendarTab> with AutomaticKeepAliveClient
                 minDate: DateTime(2021, DateTime.september, 1),
                 maxDate: DateTime(2023, DateTime.june, 30),
 								view: CalendarView.month,
+                showDatePickerButton: true,
+                initialSelectedDate: DateTime.now(),
 								dataSource: DataSource.getCalendarDataSource(),
 								onTap: calendarTapped,
 								monthViewSettings: const MonthViewSettings(
@@ -44,10 +46,23 @@ class _CalendarTabState extends State<CalendarTab> with AutomaticKeepAliveClient
                   return Container(
                     padding: currentDay ? const EdgeInsets.only(top: 4, right: 2) : const EdgeInsets.only(top: 8, left: 4, right: 2),
                     decoration: BoxDecoration(
+                      gradient: (DataSource.findWithDate(details.date, DataSource.halfDays) || details.date.toString().split(" ")[0] == DataSource.findWithTitle("Last Day of School", year, DataSource.schoolYearBookends).toString().split(" ")[0])
+                      ? LinearGradient(
+                        colors: [
+                          Theme.of(context).canvasColor,
+                          Theme.of(context).canvasColor,
+                          ExtraStuff.darken(Theme.of(context).canvasColor, 0.04),
+                          ExtraStuff.darken(Theme.of(context).canvasColor, 0.04)
+                        ],
+                        stops: const [0, 0.55, 0.55, 1],
+                        end: Alignment.bottomCenter,
+                        begin: Alignment.topCenter,
+                      )
+                      : null,
                       color: (details.date.weekday == 6 || details.date.weekday == 7)
-                      || (details.appointments.isNotEmpty ? details.appointments.toString().contains("id: closed") : false)
-                      || (details.date.isAfter(DataSource.findWithID("lastDayOfSchool", year, DataSource.schoolYearBookends)) && details.date.isBefore(DataSource.findWithID("firstDayOfSchool", year, DataSource.schoolYearBookends)))
-                        ? ExtraStuff.darken(Theme.of(context).canvasColor, 0.05)
+                      || (DataSource.findWithDate(details.date, DataSource.plannedClosings) || DataSource.findWithDate(details.date, DataSource.unplannedClosings))
+                      || (details.date.isAfter(DataSource.findWithTitle("Last Day of School", year, DataSource.schoolYearBookends)) && details.date.isBefore(DataSource.findWithTitle("First Day of School", year, DataSource.schoolYearBookends)))
+                        ? ExtraStuff.darken(Theme.of(context).canvasColor, 0.04)
                         : Theme.of(context).canvasColor,
                       border: details.date.isAfter(DateTime(year,month,firstSunday)) 
                       ? Border.all(color: Colors.black12, width: 0.25)
@@ -128,12 +143,16 @@ class _CalendarTabState extends State<CalendarTab> with AutomaticKeepAliveClient
 										return Container(
 											padding: const EdgeInsets.all(2),
 											height: 60,
-											color: _appointmentDetails[index].id != "closed"
+											color: _appointmentDetails[index].id != "Closed"  && _appointmentDetails[index].id != "HalfDay"
                         ? _appointmentDetails[index].color
-                        : Colors.red[600],
+                        :  _appointmentDetails[index].id == "HalfDay"
+                          ? _appointmentDetails[index].subject.contains("Last Day of School")
+                            ? SchoolColors.UCVTS
+                            : ExtraStuff.lighten(Colors.red[600]!, 0.05)
+                          : Colors.red[600],
 											child: ListTile(
 												contentPadding: const EdgeInsets.fromLTRB(10, 0, 20, 0),
-												leading: _appointmentDetails[index].id == "closed"
+												leading: _appointmentDetails[index].id == "Closed"
                         ? null
                         : ExtraStuff.centerAlign(
                           (_appointmentDetails[index].isAllDay
@@ -161,16 +180,22 @@ class _CalendarTabState extends State<CalendarTab> with AutomaticKeepAliveClient
 												title: FittedBox(
 													fit: BoxFit.scaleDown,
 													child: Text(
-                            _appointmentDetails[index].id != "closed"
-                            ? "${_appointmentDetails[index].subject} ${_appointmentDetails[index].notes! != "UCVTS" ? "for ${_appointmentDetails[index].notes!}" : ""}${_appointmentDetails[index].location != null ? "\nin ${_appointmentDetails[index].location}" : ""}"
-                            : "Closed for ${_appointmentDetails[index].subject}",
+                            _appointmentDetails[index].id != "Closed" && _appointmentDetails[index].id != "HalfDay"
+                            ? "${_appointmentDetails[index].subject} ${(_appointmentDetails[index].notes != null && _appointmentDetails[index].notes != "UCVTS") ? "for ${_appointmentDetails[index].notes}" : ""}${_appointmentDetails[index].location != null ? "\nin ${_appointmentDetails[index].location}" : ""}"
+                            :  _appointmentDetails[index].id == "HalfDay"
+                              ? !_appointmentDetails[index].subject.contains("Last Day of School")
+                                ? "Early Dismissal for ${_appointmentDetails[index].subject}"
+                                : "Have a great summer!!!"
+                              : "Closed for ${_appointmentDetails[index].subject}",
 														textAlign: TextAlign.center,
 														style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white)
 													)
 												),
-												trailing: _appointmentDetails[index].id != "closed"
+												trailing: _appointmentDetails[index].id != "Closed" && _appointmentDetails[index].id != "HalfDay"
                         ? Icon(SchoolLogos.getSchoolLogo(_appointmentDetails[index].notes!), size: 30, color: Colors.white)
-                        :  null,
+                        :  _appointmentDetails[index].subject.contains("Last Day of School")
+                          ? const Icon(SchoolLogos.UCVTS, size: 30, color: Colors.white)
+                          : null,
 											)
 										);
 									},
@@ -328,10 +353,19 @@ class HumanFriendlyAppointment extends Appointment{
 
   HumanFriendlyAppointment.closed({required this.date, required this.title}) :
   super(
-    id: "closed",
+    id: "Closed",
     startTime: humanToDateTime(date, "00:00"),
     endTime: humanToDateTime(date, "23:59"),
 		isAllDay: true,
+    subject: title,
+    color: Colors.transparent,
+  );
+
+  HumanFriendlyAppointment.halfDay({required this.date, required this.title}) :
+  super(
+    id: "HalfDay",
+    startTime: humanToDateTime(date, "08:00"),
+    endTime: humanToDateTime(date, "12:24"),
     subject: title,
     color: Colors.transparent,
   );
@@ -349,16 +383,25 @@ class DataSource extends CalendarDataSource {
 		return DataSource(appointments);
 	}
 
-  static DateTime findWithID(String findID, int year, List<Appointment> directory, [int offset = 0]){
+  static DateTime findWithTitle(String findTitle, int year, List<Appointment> directory, [int offset = 0]){
     for (Appointment appt in directory) {
-      if (appt.id == findID && appt.startTime.year == year){
+      if (appt.subject.contains(findTitle) && appt.startTime.year == year){
         return DateTime(appt.startTime.year, appt.startTime.month, appt.startTime.day + offset);
       }
     }
     return DateTime.now();
   }
 
-  static List<Appointment> appts = generalEvents + districtWideEvents + schoolSpecificEvents + clubEvents + schoolYearBookends + schoolClosings;
+  static bool findWithDate(DateTime findDate, List<Appointment> directory){
+    for (Appointment appt in directory) {
+      if (DateTime(appt.startTime.year, appt.startTime.month, appt.startTime.day) == DateTime(findDate.year, findDate.month, findDate.day)){
+        return true;
+      }
+    }
+    return false;
+  }
+
+  static List<Appointment> appts = generalEvents + districtWideEvents + schoolSpecificEvents + clubEvents + schoolYearBookends + schoolClosings + halfDays;
 
   static List<Appointment> generalEvents = <Appointment>[
     HumanFriendlyAppointment.allDay(date: "10/18/22", title: "Meeting", where: "Room 123"),
@@ -381,10 +424,11 @@ class DataSource extends CalendarDataSource {
   ];
 
   static List<Appointment> schoolYearBookends = <Appointment>[
-    HumanFriendlyAppointment.allDay(eventID: "firstDayOfSchool", date: "9/8/21", title: "First Day of School 2021-22"),
-    HumanFriendlyAppointment.allDay(eventID: "lastDayOfSchool", date: "6/20/22", title: "Last Day of School 2021-22"),
-    HumanFriendlyAppointment.allDay(eventID: "firstDayOfSchool", date: "9/6/22", title: "First Day of School 2022-23"),
-    HumanFriendlyAppointment.allDay(eventID: "lastDayOfSchool", date: "6/20/23", title: "Last Day of School 2022-23")
+    HumanFriendlyAppointment.allDay(date: "9/8/21", title: "First Day of School 2021-22"),
+    HumanFriendlyAppointment.halfDay(date: "6/20/22", title: "Last Day of School 2021-22"),
+    HumanFriendlyAppointment.allDay(date: "9/6/22", title: "First Day of School 2022-23"),
+    HumanFriendlyAppointment.halfDay(date: "6/20/23", title: "Last Day of School 2022-23"),
+    HumanFriendlyAppointment.allDay(date: "9/7/23", title: "First Day of School 2023-24???"),
   ];
 
   static List<Appointment> schoolClosings = plannedClosings + unplannedClosings;
@@ -395,11 +439,34 @@ class DataSource extends CalendarDataSource {
     HumanFriendlyAppointment.closed(date: "11/10/22", title: "NJEA Convention"),
     HumanFriendlyAppointment.closed(date: "11/11/22", title: "NJEA Convention"),
     HumanFriendlyAppointment.closed(date: "11/24/22", title: "Thanksgiving"),
-    HumanFriendlyAppointment.closed(date: "11/25/22", title: "Thanksgiving")
+    HumanFriendlyAppointment.closed(date: "11/25/22", title: "Thanksgiving"),
+    HumanFriendlyAppointment.closed(date: "12/26/22", title: "Winter Break"),
+    HumanFriendlyAppointment.closed(date: "12/27/22", title: "Winter Break"),
+    HumanFriendlyAppointment.closed(date: "12/28/22", title: "Winter Break"),
+    HumanFriendlyAppointment.closed(date: "12/29/22", title: "Winter Break"),
+    HumanFriendlyAppointment.closed(date: "12/30/22", title: "Winter Break"),
+    HumanFriendlyAppointment.closed(date: "1/2/23", title: "Winter Break"),
+    HumanFriendlyAppointment.closed(date: "1/16/23", title: "Dr. Martin Luther King, Jr. Holiday"),
+    HumanFriendlyAppointment.closed(date: "2/17/23", title: "Staff Development #3"),
+    HumanFriendlyAppointment.closed(date: "2/20/23", title: "Presidents' Day"),
+    HumanFriendlyAppointment.closed(date: "4/7/23", title: "Good Friday"),
+    HumanFriendlyAppointment.closed(date: "4/10/23", title: "Spring Break"),
+    HumanFriendlyAppointment.closed(date: "4/11/23", title: "Spring Break"),
+    HumanFriendlyAppointment.closed(date: "4/12/23", title: "Spring Break"),
+    HumanFriendlyAppointment.closed(date: "4/13/23", title: "Spring Break"),
+    HumanFriendlyAppointment.closed(date: "4/14/23", title: "Spring Break"),
+    HumanFriendlyAppointment.closed(date: "5/29/23", title: "Memorial Day"),
+    HumanFriendlyAppointment.closed(date: "6/16/23", title: "Juneteenth"),
   ];
 
   static List<Appointment> unplannedClosings = <Appointment>[
     HumanFriendlyAppointment.closed(date: "10/6/22", title: "Power Repairs")
+  ];
+
+  static List<Appointment> halfDays = <Appointment>[
+    HumanFriendlyAppointment.halfDay(date: "11/23/22", title: "Thanksgiving"),
+    HumanFriendlyAppointment.halfDay(date: "12/23/22", title: "Winter Break"),
+    HumanFriendlyAppointment.halfDay(date: "4/6/23", title: "Spring Break")
   ];
 }
 
@@ -423,15 +490,15 @@ class ABdays{
     return days;
   }
 
-  static dynamic days21_22 = ABdays.ABdayGenerator(DataSource.findWithID("firstDayOfSchool", 2021, DataSource.schoolYearBookends, -1), DataSource.findWithID("lastDayOfSchool", 2022, DataSource.schoolYearBookends, 1));
-  static dynamic days22_23 = ABdays.ABdayGenerator(DataSource.findWithID("firstDayOfSchool", 2022, DataSource.schoolYearBookends, -1), DataSource.findWithID("lastDayOfSchool", 2023, DataSource.schoolYearBookends, 1));
+  static dynamic days21_22 = ABdays.ABdayGenerator(DataSource.findWithTitle("First Day of School", 2021, DataSource.schoolYearBookends, -1), DataSource.findWithTitle("Last Day of School", 2022, DataSource.schoolYearBookends, 1));
+  static dynamic days22_23 = ABdays.ABdayGenerator(DataSource.findWithTitle("First Day of School", 2022, DataSource.schoolYearBookends, -1), DataSource.findWithTitle("Last Day of School", 2023, DataSource.schoolYearBookends, 1));
 
   // ignore: non_constant_identifier_names
   static String daysFinder(DateTime date){
-    if (date.isAfter(DataSource.findWithID("firstDayOfSchool", 2021, DataSource.schoolYearBookends, -1)) && date.isBefore(DataSource.findWithID("lastDayOfSchool", 2022, DataSource.schoolYearBookends, 1))){ 
+    if (date.isAfter(DataSource.findWithTitle("First Day of School", 2021, DataSource.schoolYearBookends, -1)) && date.isBefore(DataSource.findWithTitle("Last Day of School", 2022, DataSource.schoolYearBookends, 1))){ 
       return days21_22.containsKey(date) ? days21_22[date] : "";
     }
-    else if (date.isAfter(DataSource.findWithID("firstDayOfSchool", 2022, DataSource.schoolYearBookends, -1)) && date.isBefore(DataSource.findWithID("lastDayOfSchool", 2023, DataSource.schoolYearBookends, 1))){ 
+    else if (date.isAfter(DataSource.findWithTitle("First Day of School", 2022, DataSource.schoolYearBookends, -1)) && date.isBefore(DataSource.findWithTitle("Last Day of School", 2023, DataSource.schoolYearBookends, 1))){ 
       return days22_23.containsKey(date) ? days22_23[date] : "";
     }
     else{
@@ -439,7 +506,6 @@ class ABdays{
     }
   }
 }
-
 
 // default monthCellBuilder
 /*dynamic monthCellBuilder (BuildContext BuildContext, MonthCellDetails details) {
