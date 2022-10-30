@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ucvts_app_fbla/school_colors.dart';
+import 'package:ucvts_app_fbla/school_identities.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'custom_icons_icons.dart';
@@ -10,7 +10,6 @@ import 'panel.dart';
 void main() => runApp(const MyApp());
 
 PanelController _pc = PanelController();
-CalendarTab calTab = CalendarTab();
 Slidey slide = Slidey();
 
 class MyApp extends StatelessWidget {
@@ -105,7 +104,6 @@ class _MyHomePageState extends State<MyHomePage> {
           color: const Color(0xff2196f3),
           child: TabBar(
             onTap: (int i){
-              _pc.close();
               i == 1 ? _pc.hide() : _pc.show();
             }, 
             tabs: const [
@@ -117,18 +115,30 @@ class _MyHomePageState extends State<MyHomePage> {
           )
         ),
         body: Stack(children: <Widget>[
-          TabBarView(physics: const NeverScrollableScrollPhysics(),children: [
+          TabBarView(children: [
             // The displays of the different tabs, in order (VERY IMPORTANT)
-            ExtraStuff.centerAlign([ExtraStuff.weLoveAIT,]), 
-            calTab.tab(),
+            SingleChildScrollView(child:
+              ExtraStuff.centerAlign([
+                ExtraStuff.weLoveAIT,
+                const SizedBox(height: 30),
+                const SizedBox(height: 280, child: UpcomingEvents()),
+                const SizedBox(height: 30),
+                const Text("We Love Clubs!!!", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                Column(children: List.generate(6, (i) => Text("\nCLUB TITLE - ${"Description " * 12}\n")).toList()),
+                const SizedBox(height: 29 + 5)
+              ]),
+            ),
+            const CalendarTab(),
             ExtraStuff.centerAlign([
               const Icon(CustomIcons.ucvts),
               Text("${DateTime.now().year.toString()}-${DateTime.now().month.toString()}-${DateTime.now().day.toString()}"),
-              const Text("\n\nUCVTS Logo",style: TextStyle(color: SchoolColors.UCVTS))
+              const Text("\n\nUCVTS Logo",style: TextStyle(color: SchoolColors.UCVTS)),
+              const Text("\n\nMagnet more like bad",style: TextStyle(color: SchoolColors.Magnet))
             ]),
             ExtraStuff.centerAlign([
               Text('tabBar Height = 29\n\nOG Panel Height = ${screenHeight * 0.8}\n vs.\nError Height = ${(29 + 22 + (Slidey.buttonHeight * 4) + 40)}'),
-              const Text("\n\nIT'S ALIIIIIIIVE"),
+              const Text("\n\nIT'S ALIIIIIIIVE v4"),
+              Text('Panel Width = ${MediaQuery.of(context).size.width}'),
               const SizedBox(height: 30),
               Image.asset('assets/Dole.jpg', alignment: Alignment.center)
             ])
