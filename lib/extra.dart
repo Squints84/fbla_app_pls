@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'school_colors.dart';
+import 'school_identities.dart';
 
 class ExtraStuff {
   static Widget weLoveAIT = Column(
@@ -34,5 +34,23 @@ class ExtraStuff {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: widg
     );
-  }  // Self-made aligment widget so barebonesy stuff looks nice
+  } // Self-made aligment widget so barebonesy stuff looks nice
+
+  static Color darken(Color color, [double amount = .1]) {
+    assert(amount >= 0 && amount <= 1);
+
+    final hsl = HSLColor.fromColor(color);
+    final hslDark = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
+
+    return hslDark.toColor();
+  }
+
+  static Color lighten(Color color, [double amount = .1]) {
+    assert(amount >= 0 && amount <= 1);
+
+    final hsl = HSLColor.fromColor(color);
+    final hslLight = hsl.withLightness((hsl.lightness + amount).clamp(0.0, 1.0));
+
+    return hslLight.toColor();
+  }
 }

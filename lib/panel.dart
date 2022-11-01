@@ -62,24 +62,21 @@ Widget _pullyBar() {
 
 Widget _buttonRow(List<Widget> widgs) {
   return ButtonBarSuper(
-      wrapType: WrapType.fit,
-      wrapFit: WrapFit.divided,
-      spacing: 10,
-      children: widgs);
+    wrapType: WrapType.fit,
+    wrapFit: WrapFit.divided,
+    spacing: 10,
+    children: widgs
+  );
 } // Simplification of ButtonBarSuper with premade size / format styling
 
 Widget _snackButton(BuildContext context, Widget inside, String text) {
   return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        minimumSize: Size.fromHeight(Slidey
-            .buttonHeight), // We need this stupid style thing because I think the ListView and/or the panel itself is fucking with the normal ButtonBar height setter...
-      ),
-      onPressed: () {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(text), duration: const Duration(seconds: 1)));
-      }, // Action to be done upon button press
-      child: inside // What the button displays
-      );
+    style: ElevatedButton.styleFrom( minimumSize: Size.fromHeight(Slidey .buttonHeight)), // We need this stupid style thing because I think the ListView and/or the panel itself is fucking with the normal ButtonBar height setter...
+    onPressed: () {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar( content: Text(text), duration: const Duration(seconds: 1)));
+    }, // Action to be done upon button press
+    child: inside // What the button displays
+  );
 } // Default button Widget so that the ButtonBars don't get too crowded, we can always add individual button styles later
 
 Widget _pageButton(BuildContext context, Widget inside, StatelessWidget page) {
