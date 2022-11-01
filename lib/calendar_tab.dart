@@ -44,7 +44,7 @@ class _CalendarTabState extends State<CalendarTab> with AutomaticKeepAliveClient
                   bool currentMonth = details.date.month.toString() == month.toString();
 
                   return Container(
-                    padding: currentDay ? const EdgeInsets.only(top: 4, right: 2) : const EdgeInsets.only(top: 8, left: 4, right: 2),
+                    padding: currentDay ? const EdgeInsets.only(top: 4, right: 2) : const EdgeInsets.only(top: 8),
                     decoration: BoxDecoration(
                       gradient: (DataSource.findWithDate(details.date, DataSource.halfDays) || details.date.toString().split(" ")[0] == DataSource.findWithTitle("Last Day of School", year, DataSource.schoolYearBookends).toString().split(" ")[0])
                       ? LinearGradient(
@@ -78,6 +78,7 @@ class _CalendarTabState extends State<CalendarTab> with AutomaticKeepAliveClient
                       child: currentDay
                       ? Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        
                         children: [
                           Container(
                             width: 26,
@@ -95,7 +96,9 @@ class _CalendarTabState extends State<CalendarTab> with AutomaticKeepAliveClient
                             ),
                           ),
                           Text(
-                            ABdays.daysFinder(details.date),
+                            DataSource.findWithTitle("First Day of School", year, DataSource.schoolYearBookends) == DateTime.parse(details.date.toString().split(" ")[0])
+                            ? "A"
+                            : ABdays.daysFinder(details.date),
                             style: TextStyle(fontSize: 13, color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold)
                           )
                         ]
@@ -109,7 +112,9 @@ class _CalendarTabState extends State<CalendarTab> with AutomaticKeepAliveClient
                               style: const TextStyle(fontSize: 13)
                             ),
                             Text(
-                              ABdays.daysFinder(details.date),
+                              DataSource.findWithTitle("First Day of School", year, DataSource.schoolYearBookends) == DateTime.parse(details.date.toString().split(" ")[0])
+                              ? "A"
+                              : ABdays.daysFinder(details.date),
                               style: TextStyle(fontSize: 13, color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold)
                             )
                           ]
@@ -122,7 +127,9 @@ class _CalendarTabState extends State<CalendarTab> with AutomaticKeepAliveClient
                               style: const TextStyle(fontSize: 13, color: Colors.black45)
                             ),
                             Text(
-                              ABdays.daysFinder(details.date),
+                              DataSource.findWithTitle("First Day of School", year, DataSource.schoolYearBookends) == DateTime.parse(details.date.toString().split(" ")[0])
+                              ? "A"
+                              : ABdays.daysFinder(details.date),
                               style: TextStyle(fontSize: 13, color: Theme.of(context).primaryColor.withOpacity(0.45), fontWeight: FontWeight.bold)
                             )
                           ]
@@ -145,10 +152,8 @@ class _CalendarTabState extends State<CalendarTab> with AutomaticKeepAliveClient
 											height: 60,
 											color: _appointmentDetails[index].id != "Closed"  && _appointmentDetails[index].id != "HalfDay"
                         ? _appointmentDetails[index].color
-                        :  _appointmentDetails[index].id == "HalfDay"
-                          ? _appointmentDetails[index].subject.contains("Last Day of School")
-                            ? SchoolColors.UCVTS
-                            : ExtraStuff.lighten(Colors.red[600]!, 0.05)
+                        :  _appointmentDetails[index].subject.contains("Last Day of School")
+                          ? SchoolColors.UCVTS
                           : Colors.red[600],
 											child: ListTile(
 												contentPadding: const EdgeInsets.fromLTRB(10, 0, 20, 0),
