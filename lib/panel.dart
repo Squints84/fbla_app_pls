@@ -29,7 +29,7 @@ class Slidey {
           ]),
 
           _buttonRow([
-            _pageButton(context, const Text("District News Letter"),DistrictNewsLetterPage()) // "Built in PDF -> Talk to Kneisel"
+            _pageButton(context, const Text("District News Letter"),const DistrictNewsLetterPage()) // "Built in PDF -> Talk to Kneisel"
           ]),
 
           _buttonRow([
@@ -79,7 +79,7 @@ Widget _snackButton(BuildContext context, Widget inside, String text) {
   );
 } // Default button Widget so that the ButtonBars don't get too crowded, we can always add individual button styles later
 
-Widget _pageButton(BuildContext context, Widget inside, StatelessWidget page) {
+Widget _pageButton(BuildContext context, Widget inside, Widget page) {
   return ElevatedButton(
       style: ElevatedButton.styleFrom(
         minimumSize: Size.fromHeight(Slidey.buttonHeight), // We need this stupid style thing because I think the ListView and/or the panel itself is fucking with the normal ButtonBar height setter...

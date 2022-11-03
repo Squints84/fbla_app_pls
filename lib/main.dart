@@ -157,7 +157,6 @@ class _MyHomePageState extends State<MyHomePage> {
               topLeft: Radius.circular(18.0),
               topRight: Radius.circular(18.0)
             ),
-            color: const Color(0xfff2f2f2), // I only colored it so you can see the difference between the phone border and the panel
             onPanelOpened: () {setState(() {Slidey.opened = true;});},
             onPanelClosed: () {setState(() {Slidey.opened = false;});},
             panelBuilder: (ScrollController sc) => slide.panel(_pc,sc)

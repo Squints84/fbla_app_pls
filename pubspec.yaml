@@ -32,8 +32,8 @@ environment:
 dependencies:
   intl: ^0.17.0
   url_launcher: ^6.1.6
+  advance_pdf_viewer: ^2.0.1
   sliding_up_panel: ^2.0.0+1
-  flutter_cached_pdfview: ^0.4.1
   assorted_layout_widgets: ^7.0.0
   syncfusion_flutter_calendar: ^20.3.50
   flutter:
