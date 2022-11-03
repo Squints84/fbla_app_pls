@@ -1,8 +1,8 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.fbla.fbla_app">
-   <application
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+   <!--suppress AndroidDomInspection -->
+    <application
         android:label="fbla_app"
-        android:name="${applicationName}"
+        android:name="UCVTS App"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
