@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'school_identities.dart';
+import 'icons_and_colors/school_identities.dart';
 
 class ExtraStuff {
   static Widget weLoveAIT = Column(

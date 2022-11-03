@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:assorted_layout_widgets/assorted_layout_widgets.dart';
-import 'custom_icons_icons.dart';
+import 'icons_and_colors/custom_icons_icons.dart';
 import 'pages.dart';
 
 class Slidey {

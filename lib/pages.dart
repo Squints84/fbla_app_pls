@@ -61,7 +61,7 @@ class DistrictNewsLetterPage extends StatelessWidget {
         title: Text(title,style: const TextStyle(fontSize: 17.5),textAlign: TextAlign.center)
       ),
       body: Center(
-        child: const PDF().cachedFromUrl('https://www.ucvts.org/cms/lib/NJ50000421/Centricity/Domain/4/UCVTS%20DISTRICT%20NEWSLETTER%20${months[DateTime.now().month - 1]}%20${DateTime.now().year.toString()}.pdf')
+        child: const PDF().cachedFromUrl('https://www.ucvts.org/cms/lib/NJ50000421/Centricity/Domain/4/UCVTS%20DISTRICT%20NEWSLETTER%20${months[DateTime.now().month - 1]}%20${DateTime.now().year}.pdf')
       ),
     );
   }
