@@ -78,7 +78,7 @@ class _UpcomingEventsState extends State<UpcomingEvents>  with AutomaticKeepAliv
 														style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white)
 													)
 												),
-												trailing: Icon(SchoolLogos.getSchoolLogo(_appointmentDetails[index].notes!), size: 30, color: Colors.white),
+												trailing: Icon(SchoolIcons.getSchoolIcon(_appointmentDetails[index].notes!), size: 30, color: Colors.white),
 											)
 										);
 									},

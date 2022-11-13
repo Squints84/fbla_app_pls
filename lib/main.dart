@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ucvts_app_fbla/pages.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'icons_and_colors/custom_icons_icons.dart';
@@ -7,6 +8,8 @@ import 'calendars/upcoming_events_bar.dart';
 import 'calendars/calendar_tab.dart';
 import 'extra.dart';
 import 'panel.dart';
+
+double v = 2.5;
 
 void main() => runApp(const MyApp());
 
@@ -40,11 +43,11 @@ class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<MyHomePage> createState() => MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  String school = "AIT";
+class MyHomePageState extends State<MyHomePage> {
+  static String school = "AIT";
 
   @override
   Widget build(BuildContext context) {
@@ -75,6 +78,16 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           actions: [
             IconButton(
+              icon: const Icon(Icons.settings),
+              tooltip: 'Settings',
+              onPressed: () async {
+                String selectedSchool = await Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsPage()));
+                setState(() {
+                  school = selectedSchool;
+                });
+              },
+            )
+            /*IconButton(
               icon: const Icon(Icons.check_box),
               tooltip: 'Fact  Checker',
               onPressed: () {
@@ -98,7 +111,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   )
                 ));
               },
-            )
+            )*/
           ]
         ),
         bottomNavigationBar: Container(
@@ -124,7 +137,8 @@ class _MyHomePageState extends State<MyHomePage> {
               // The displays of the different tabs, in order (VERY IMPORTANT)
               /*Tab 1*/SingleChildScrollView(child:
                 ExtraStuff.centerAlign([
-                  ExtraStuff.weLoveAIT,
+                  const SizedBox(height: 20),
+                  ExtraStuff.weLoveOurSchool(school),
                   const SizedBox(height: 30),
                   const SizedBox(height: 280, child: UpcomingEvents()),
                   const SizedBox(height: 30),
@@ -142,7 +156,8 @@ class _MyHomePageState extends State<MyHomePage> {
               ]),
               /*Tab 4*/ExtraStuff.centerAlign([
                 Text('tabBar Height = 29\n\nOG Panel Height = ${screenHeight * 0.8}\n vs.\nError Height = ${(29 + 22 + (Slidey.buttonHeight * 4) + 40)}'),
-                const Text("\n\nIT'S ALIIIIIIIVE v33"),
+                Text("\n\nIT'S ALIIIIIIIVE v$v"),
+                Text("Current School = $school"),
                 Text('View Padding = ${MediaQuery.of(context).viewPadding.bottom}'),
                 const SizedBox(height: 30),
                 Image.asset('assets/Dole.jpg', alignment: Alignment.center)

@@ -198,9 +198,9 @@ class _CalendarTabState extends State<CalendarTab> with AutomaticKeepAliveClient
 													)
 												),
 												trailing: _appointmentDetails[index].id != "Closed" && _appointmentDetails[index].id != "HalfDay"
-                        ? Icon(SchoolLogos.getSchoolLogo(_appointmentDetails[index].notes!), size: 30, color: Colors.white)
+                        ? Icon(SchoolIcons.getSchoolIcon(_appointmentDetails[index].notes!), size: 30, color: Colors.white)
                         :  _appointmentDetails[index].subject.contains("Last Day of School")
-                          ? const Icon(SchoolLogos.UCVTS, size: 30, color: Colors.white)
+                          ? const Icon(SchoolIcons.UCVTS, size: 30, color: Colors.white)
                           : null,
 											)
 										);
